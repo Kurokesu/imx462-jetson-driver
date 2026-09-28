@@ -20,7 +20,7 @@
 	fragment@0 {
 		target-path = "/";
 		__overlay__ {
-			tegra-capture-vi  {
+			tegra-capture-vi {
 				num-channels = <1>;
 				ports {
 					#address-cells = <1>;
