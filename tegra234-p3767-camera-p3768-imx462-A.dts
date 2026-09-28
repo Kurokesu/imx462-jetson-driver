@@ -84,7 +84,7 @@
 					module0 {
 						badge = "kurokesu_front_462CSI";
 						position = "front";
-						orientation = "1";
+						orientation = "0";
 						drivernode0 {
 							pcl_id = "v4l2_sensor";
 							sysfs-device-tree = "/sys/firmware/devicetree/base/bus@0/cam_i2cmux/i2c@0/rbpcv3_imx462_a@1a";
