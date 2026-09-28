@@ -125,7 +125,7 @@ sudo apt install -y v4l-utils
 Stream raw data to file:
 
 ```bash
-v4l2-ctl -d /dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=RG10 --stream-mmap --stream-to imx462_1080p.raw --stream-count=1 --stream-skip=10 --verbose
+v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0 --set-fmt-video=width=1920,height=1080,pixelformat=RG10 --stream-mmap --stream-to imx462_1080p.raw --stream-count=1 --stream-skip=10 --verbose
 ```
 
 View raw Bayer file:
