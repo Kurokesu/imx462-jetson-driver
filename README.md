@@ -12,9 +12,6 @@ NVIDIA Jetson kernel driver for Sony IMX462, a 2 MP 1/2.8" STARVIS back-side ill
 - 1920×1080 @ 30 fps
 - HCG (High Conversion Gain) mode for improved low-light SNR
 
-> [!NOTE]
-> Currently, only `cam0` port support is implemented.
-
 ![Kurokesu camera modules connected to a Jetson carrier board over CSI ribbon cables.](./docs/kurokesu-on-jetson.jpg)
 
 *IMX462 camera modules are available at [kurokesu.com](https://www.kurokesu.com/item/462C-CSI)*
@@ -58,9 +55,13 @@ Navigate through the menu:
 
 1. Configure Jetson CSI Connector (named "22pin" on 6.2.2, "24pin" on 6.2.1)
 2. Configure for compatible hardware
-3. Select `Camera IMX462-A`
+3. Select port configuration:
 
-    ![Jetson-IO menu with Camera IMX462-A selected.](./docs/jetson-io-tool.png)
+    - `Camera IMX462-A` - cam0
+    - `Camera IMX462-C` - cam1
+    - `Camera IMX462 Dual` - cam0 + cam1
+
+    ![Jetson-IO menu with Camera IMX462 Dual selected.](./docs/jetson-io-tool.png)
 
 4. Save pin changes
 5. Save and reboot to reconfigure pins
@@ -71,12 +72,14 @@ After reboot, verify sensor is detected:
 sudo dmesg | grep imx462
 ```
 
-Expected output:
+Expected output (dual):
 
 ```
 nv_imx462: module verification failed: signature and/or required key missing - tainting kernel
 imx462 9-001a: tegracam sensor driver:imx462_v2.0.6
 tegra-camrtc-capture-vi tegra-capture-vi: subdev imx462 9-001a bound
+imx462 10-001a: tegracam sensor driver:imx462_v2.0.6
+tegra-camrtc-capture-vi tegra-capture-vi: subdev imx462 10-001a bound
 ```
 
 *Signature warning is expected since DKMS modules are unsigned.*
@@ -85,10 +88,24 @@ tegra-camrtc-capture-vi tegra-capture-vi: subdev imx462 9-001a bound
 
 ### GStreamer
 
+Single:
+
 ```bash
 gst-launch-1.0 -e nvarguscamerasrc sensor-id=0 ! \
    'video/x-raw(memory:NVMM),width=1920,height=1080,framerate=30/1' ! \
    queue ! nvvidconv ! queue ! nveglglessink
+```
+
+Dual:
+
+```bash
+gst-launch-1.0 -e \
+   nvarguscamerasrc sensor-id=0 ! \
+      'video/x-raw(memory:NVMM),width=1920,height=1080,framerate=30/1' ! \
+      queue ! nvvidconv ! queue ! nveglglessink \
+   nvarguscamerasrc sensor-id=1 ! \
+      'video/x-raw(memory:NVMM),width=1920,height=1080,framerate=30/1' ! \
+      queue ! nvvidconv ! queue ! nveglglessink
 ```
 
 ### nvgstcapture
@@ -108,7 +125,7 @@ sudo apt install -y v4l-utils
 Stream raw data to file:
 
 ```bash
-v4l2-ctl -d /dev/video0 --set-fmt-video=width=1920,height=1080,pixelformat=RG10 --stream-mmap --stream-to imx462_1080p.raw --stream-count=1 --stream-skip=10 --verbose
+v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0 --set-fmt-video=width=1920,height=1080,pixelformat=RG10 --stream-mmap --stream-to imx462_1080p.raw --stream-count=1 --stream-skip=10 --verbose
 ```
 
 View raw Bayer file:
@@ -165,10 +182,13 @@ echo 0 | sudo tee /sys/module/nv_imx462/parameters/test_mode
 
 Tuning file carries ISP parameters calibrated for this sensor: black level, lens shading, white balance and color correction. Global `camera_overrides.isp` applies to every camera and would shadow it, so setup retires it to `camera_overrides.isp.bak`.
 
-To restore default ISP parameters, remove tuning file and restart Argus:
+Setup installs a file per badge, `kurokesu_front_462CSI.isp` and `kurokesu_rear_462CSI.isp`, so each camera on a dual board resolves its own.
+
+To restore default ISP parameters, remove tuning files and restart Argus:
 
 ```bash
 sudo rm /var/nvidia/nvcam/settings/kurokesu_front_462CSI.isp
+sudo rm /var/nvidia/nvcam/settings/kurokesu_rear_462CSI.isp
 sudo systemctl restart nvargus-daemon
 ```
 
