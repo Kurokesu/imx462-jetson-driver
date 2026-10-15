@@ -4,6 +4,7 @@
 [![Version](https://img.shields.io/github/v/tag/Kurokesu/imx462-jetson-driver?sort=semver&filter=v*)](https://github.com/Kurokesu/imx462-jetson-driver/tags)
 ![JetPack 6.2.1](https://img.shields.io/badge/JetPack_6.2.1-L4T_36.4.4-brightgreen?logo=nvidia&logoColor=white)
 ![JetPack 6.2.2](https://img.shields.io/badge/JetPack_6.2.2-L4T_36.5.0-brightgreen?logo=nvidia&logoColor=white)
+![JetPack 6.2.3](https://img.shields.io/badge/JetPack_6.2.3-L4T_36.5.2-brightgreen?logo=nvidia&logoColor=white)
 
 NVIDIA Jetson kernel driver for Sony IMX462, a 2 MP 1/2.8" STARVIS back-side illuminated CMOS sensor optimised for low-light and night-vision applications.
 
@@ -53,7 +54,7 @@ sudo /opt/nvidia/jetson-io/jetson-io.py
 
 Navigate through the menu:
 
-1. Configure Jetson CSI Connector (named "22pin" on 6.2.2, "24pin" on 6.2.1)
+1. Configure Jetson CSI Connector (named "22pin" on 6.2.2+, "24pin" on 6.2.1)
 2. Configure for compatible hardware
 3. Select port configuration:
 
