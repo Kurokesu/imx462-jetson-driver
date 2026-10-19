@@ -139,10 +139,11 @@ Stream raw data to file:
 v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0 --set-fmt-video=width=1920,height=1080,pixelformat=RG10 --stream-mmap --stream-to imx462_1080p.raw --stream-count=1 --stream-skip=10 --verbose
 ```
 
-View raw Bayer file:
+View raw file:
 
 ```bash
 python3 view_raw.py ./imx462_1080p.raw
+python3 view_raw.py --mono ./imx462_1080p.raw  # mono sensor
 ```
 
 ## HCG mode
