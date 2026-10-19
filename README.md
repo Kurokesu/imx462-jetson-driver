@@ -121,13 +121,17 @@ gst-launch-1.0 -e \
 nvgstcapture-1.0 --sensor-id 0
 ```
 
-### Raw v4l2
+### Raw V4L2
 
-Install `v4l-utils`:
+Install `v4l-utils` and OpenCV:
 
 ```bash
 sudo apt install -y v4l-utils
+sudo apt install -y python3-opencv
 ```
+
+> [!IMPORTANT]
+> With dual overlay, NVIDIA maps cam1 to `/dev/video0` and cam0 to `/dev/video1`.
 
 Stream raw data to file:
 
