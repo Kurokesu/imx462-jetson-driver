@@ -8,10 +8,15 @@
 
 NVIDIA Jetson kernel driver for Sony IMX462, a 2 MP 1/2.8" STARVIS back-side illuminated CMOS sensor optimised for low-light and night-vision applications.
 
+Current driver capabilities:
+
 - 2-lane MIPI CSI-2
 - 10-bit RAW output
 - 1920×1080 @ 30 fps
 - HCG (High Conversion Gain) mode for improved low-light SNR
+
+> [!NOTE]
+> 12-bit and higher frame rate modes are planned.
 
 ![Kurokesu camera modules connected to a Jetson carrier board over CSI ribbon cables.](./docs/kurokesu-on-jetson.jpg)
 
