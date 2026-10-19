@@ -10,6 +10,12 @@ set -e
 # Status line formatter (matches Makefile's PRINT)
 print() { printf '  %-7s %s\n' "$1" "$2"; }
 
+# Existing link in nvcam settings is user's tuning choice (e.g. mono)
+user_link() {
+	[ -L "$1" ] || return 1
+	print KEEP "${1##*/} -> $(readlink "$1")"
+}
+
 # Package identity and install paths
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DKMS_CONF="$SCRIPT_DIR/dkms.conf"
@@ -89,7 +95,19 @@ dkms install -m "$PACKAGE_NAME" -v "$VERSION"
 # Install ISP tuning
 if [ -d "$TUNING_DIR" ]; then
 	print COPY "ISP tuning -> $NVCAM_SETTINGS"
-	cp "$TUNING_DIR"/*.isp "$NVCAM_SETTINGS/"
+	for ISP in "$TUNING_DIR"/*.isp; do
+		NAME="${ISP##*/}"
+		user_link "$NVCAM_SETTINGS/$NAME" || cp "$ISP" "$NVCAM_SETTINGS/"
+
+		# Plain <vendor>_<part> tuning is default for both badges
+		case "$NAME" in *_*_*) continue ;; esac
+		for POS in front rear; do
+			BADGE="${NAME%%_*}_${POS}_${NAME#*_}"
+			user_link "$NVCAM_SETTINGS/$BADGE" && continue
+			print LINK "$BADGE -> $NAME"
+			ln -sf "$NAME" "$NVCAM_SETTINGS/$BADGE"
+		done
+	done
 
 	if [ -e "$GLOBAL_ISP" ]; then
 		print RETIRE "camera_overrides.isp -> camera_overrides.isp.bak"
