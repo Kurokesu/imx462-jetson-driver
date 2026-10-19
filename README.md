@@ -14,6 +14,7 @@ Current driver capabilities:
 - 10-bit RAW output
 - 1920×1080 @ 30 fps
 - HCG (High Conversion Gain) mode for improved low-light SNR
+- Color and mono
 
 > [!NOTE]
 > 12-bit and higher frame rate modes are planned.
@@ -188,15 +189,27 @@ echo 0 | sudo tee /sys/module/nv_imx462/parameters/test_mode
 
 Tuning file carries ISP parameters calibrated for this sensor: black level, lens shading, white balance and color correction. Global `camera_overrides.isp` applies to every camera and would shadow it, so setup retires it to `camera_overrides.isp.bak`.
 
-Setup installs a file per badge, `kurokesu_front_462CSI.isp` and `kurokesu_rear_462CSI.isp`, so each camera on a dual board resolves its own.
+Setup installs tuning files to `/var/nvidia/nvcam/settings/`. `kurokesu_front_462CSI.isp` and `kurokesu_rear_462CSI.isp` get linked to `kurokesu_462CSI.isp`.
 
 To restore default ISP parameters, remove tuning files and restart Argus:
 
 ```bash
-sudo rm /var/nvidia/nvcam/settings/kurokesu_front_462CSI.isp
-sudo rm /var/nvidia/nvcam/settings/kurokesu_rear_462CSI.isp
+sudo rm /var/nvidia/nvcam/settings/kurokesu_*462CSI*.isp
 sudo systemctl restart nvargus-daemon
 ```
+
+### Mono sensor
+
+Point port's symlink at mono tuning:
+
+```bash
+cd /var/nvidia/nvcam/settings
+sudo ln -sf kurokesu_462CSI_mono.isp kurokesu_front_462CSI.isp  # cam0
+sudo ln -sf kurokesu_462CSI_mono.isp kurokesu_rear_462CSI.isp   # cam1
+sudo systemctl restart nvargus-daemon
+```
+
+Switch back to color by linking `kurokesu_462CSI.isp` instead.
 
 ## Development builds
 
