@@ -11,13 +11,13 @@ NVIDIA Jetson kernel driver for Sony IMX462, a 2 MP 1/2.8" STARVIS back-side ill
 Current driver capabilities:
 
 - 2-lane MIPI CSI-2
-- 10-bit RAW output
-- 1920×1080 @ 30 fps
+- 10-bit and 12-bit RAW output
+- 1920×1080 @ 60 fps
 - HCG (High Conversion Gain) mode for improved low-light SNR
 - Color and mono
 
 > [!NOTE]
-> 12-bit and higher frame rate modes are planned.
+> 4-lane support for cam1 is planned.
 
 ![Kurokesu camera modules connected to a Jetson carrier board over CSI ribbon cables.](./docs/kurokesu-on-jetson.jpg)
 
@@ -116,6 +116,14 @@ gst-launch-1.0 -e \
       queue ! nvvidconv ! queue ! nveglglessink
 ```
 
+Argus picks 12-bit mode by default. Select 10-bit mode with `sensor-mode=0`:
+
+```bash
+gst-launch-1.0 -e nvarguscamerasrc sensor-id=0 sensor-mode=0 ! \
+   'video/x-raw(memory:NVMM),width=1920,height=1080,framerate=30/1' ! \
+   queue ! nvvidconv ! queue ! nveglglessink
+```
+
 ### nvgstcapture
 
 ```bash
@@ -137,7 +145,13 @@ sudo apt install -y python3-opencv
 Stream raw data to file:
 
 ```bash
-v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0 --set-fmt-video=width=1920,height=1080,pixelformat=RG10 --stream-mmap --stream-to imx462_1080p.raw --stream-count=1 --stream-skip=10 --verbose
+v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0,sensor_mode=0 --set-fmt-video=width=1920,height=1080,pixelformat=RG10 --stream-mmap --stream-to imx462_1080p.raw --stream-count=1 --stream-skip=10 --verbose
+```
+
+12-bit mode:
+
+```bash
+v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0,sensor_mode=1 --set-fmt-video=width=1920,height=1080,pixelformat=RG12 --stream-mmap --stream-to imx462_1080p_12bit.raw --stream-count=1 --stream-skip=10 --verbose
 ```
 
 View raw file:
@@ -145,6 +159,7 @@ View raw file:
 ```bash
 python3 view_raw.py ./imx462_1080p.raw
 python3 view_raw.py --mono ./imx462_1080p.raw  # mono sensor
+python3 view_raw.py --bits 12 ./imx462_1080p_12bit.raw
 ```
 
 ## HCG mode
