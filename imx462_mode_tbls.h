@@ -179,7 +179,7 @@ static imx462_reg imx462_mode_common[] = {
 	{ IMX462_TABLE_END, 0x00 },
 };
 
-/* 1920x1080@60fps 2-lane mode */
+/* 1920x1080@60fps 10-bit 2-lane mode */
 static imx462_reg imx462_mode_1920x1080[] = {
 	{ IMX462_ADBIT, 0x00 },
 	{ IMX462_OUT_CTRL, 0x00 },
@@ -202,6 +202,29 @@ static imx462_reg imx462_mode_1920x1080[] = {
 	{ IMX462_TABLE_END, 0x0 },
 };
 
+/* 1920x1080@60fps 12-bit 2-lane mode */
+static imx462_reg imx462_mode_1920x1080_12bit[] = {
+	{ IMX462_ADBIT, 0x01 },
+	{ IMX462_OUT_CTRL, 0x01 },
+	{ IMX462_ADBIT1, 0x00 },
+	{ IMX462_ADBIT2, 0x00 },
+	{ IMX462_ADBIT3, 0x0E },
+	{ IMX462_CSI_DT_FMT_LSB, 0x0C },
+	{ IMX462_CSI_DT_FMT_MSB, 0x0C },
+	{ IMX462_BLKLEVEL, 0xF0 },
+	{ IMX462_WINWV_OB, 12 },
+	{ IMX462_OPB_SIZE_V, 0x0A },
+	{ IMX462_X_OUT_SIZE_LSB, 1920 & 0xFF },
+	{ IMX462_X_OUT_SIZE_MSB, (1920 >> 8) & 0xFF },
+	{ IMX462_Y_OUT_SIZE_LSB, 1080 & 0xFF },
+	{ IMX462_Y_OUT_SIZE_MSB, (1080 >> 8) & 0xFF },
+	{ IMX462_GAIN, 0x00 },
+	{ IMX462_SHS1_LSB, 11 },
+	{ IMX462_HMAX_LSB, 2200 & 0xFF },
+	{ IMX462_HMAX_MSB, (2200 >> 8) & 0xFF },
+	{ IMX462_TABLE_END, 0x0 },
+};
+
 static imx462_reg imx462_mode_test_pattern[] = {
 	{ IMX462_BLKLEVEL, 0x00 },
 	{ IMX462_TABLE_WAIT_MS, IMX462_WAIT_MS * 10 },
@@ -209,6 +232,7 @@ static imx462_reg imx462_mode_test_pattern[] = {
 
 enum {
 	IMX462_MODE_1920X1080,
+	IMX462_MODE_1920X1080_12BIT,
 	IMX462_MODE_COMMON,
 	IMX462_START_STREAM,
 	IMX462_STOP_STREAM,
@@ -217,6 +241,7 @@ enum {
 
 static imx462_reg *mode_table[] = {
 	[IMX462_MODE_1920X1080] = imx462_mode_1920x1080,
+	[IMX462_MODE_1920X1080_12BIT] = imx462_mode_1920x1080_12bit,
 	[IMX462_MODE_COMMON] = imx462_mode_common,
 	[IMX462_START_STREAM] = imx462_start,
 	[IMX462_STOP_STREAM] = imx462_stop,
@@ -233,6 +258,7 @@ static const int imx462_60fps[] = {
  */
 static const struct camera_common_frmfmt imx462_frmfmt[] = {
 	{ { 1920, 1080 }, imx462_60fps, 1, 0, IMX462_MODE_1920X1080 },
+	{ { 1920, 1080 }, imx462_60fps, 1, 0, IMX462_MODE_1920X1080_12BIT },
 };
 
 #endif /* __IMX462_MODE_TBLS_H__ */
