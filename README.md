@@ -51,6 +51,7 @@ Setup script:
 - Builds and installs kernel module via [DKMS](https://github.com/dell/dkms)
 - Builds and copies device tree overlay (`.dtbo`) to `/boot`
 - Installs ISP tuning to `/var/nvidia/nvcam/settings/`
+- Installs udev rule keeping camera RTCPU awake
 
 Use Jetson-IO to configure CSI connector:
 
@@ -215,6 +216,20 @@ sudo systemctl restart nvargus-daemon
 ```
 
 Switch back to color by linking `kurokesu_462CSI.isp` instead.
+
+## RTCPU keep-awake
+
+On JetPack 6 camera RTCPU suspends after 5 s idle and redoes NVCSI calibration on resume. When that fails, next Argus (`nvarguscamerasrc`) launch gets no frames until reboot:
+
+```
+SCF: Error InvalidState: Timeout!! Skipping requests on sensor GUID 0 ... (FusaCaptureViCsiHw.cpp, function waitCsiFrameStart())
+```
+
+`setup.sh` installs `udev/99-camera-rtcpu.rules` to keep RTCPU awake, as NVIDIA [suggests](https://forums.developer.nvidia.com/t/issue-about-nvcsi/299349). Manual alternative, lasts until reboot:
+
+```bash
+echo on | sudo tee /sys/devices/platform/bc00000.rtcpu/power/control
+```
 
 ## Development builds
 
