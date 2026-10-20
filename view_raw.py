@@ -17,6 +17,13 @@ def main():
         action="store_true",
         help="Mono sensor frame, skip debayer"
     )
+    parser.add_argument(
+        "--bits",
+        type=int,
+        choices=(10, 12),
+        default=10,
+        help="Sensor bit depth (default: 10)"
+    )
     args = parser.parse_args()
 
     file_path = args.file_path.expanduser()
@@ -25,11 +32,11 @@ def main():
     with file_path.open("rb") as f:
         data = np.fromfile(f, dtype=np.uint16).reshape((H, W))
 
-    # Remove the 6 duplicated MSBs
-    raw10 = (data >> 6).astype(np.uint16)
+    # Pixel is MSB aligned, low bits repeat its MSBs
+    raw = (data >> (16 - args.bits)).astype(np.uint16)
 
-    img = raw10 if args.mono else cv2.cvtColor(raw10, cv2.COLOR_BayerRG2BGR)
-    disp = cv2.convertScaleAbs(img, alpha=255.0/1023.0)
+    img = raw if args.mono else cv2.cvtColor(raw, cv2.COLOR_BayerRG2BGR)
+    disp = cv2.convertScaleAbs(img, alpha=255.0 / ((1 << args.bits) - 1))
 
     cv2.imshow("Mono" if args.mono else "Bayer", disp)
     cv2.waitKey(0)
