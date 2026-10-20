@@ -167,19 +167,19 @@ static imx462_reg imx462_mode_common[] = {
 	{ IMX462_INCKSEL6, 0x1A },
 	{ IMX462_PHY_LANE_NUM, 0x01 }, /* 2 lanes */
 	{ IMX462_CSI_LANE_MODE, 0x01 }, /* 2 lanes */
-	{ IMX462_REPETITION, 0x10 },
-	{ IMX462_TCLKPOST, 0x57 },
-	{ IMX462_THSZERO, 0x37 },
-	{ IMX462_THSPREPARE, 0x1F },
-	{ IMX462_TCLKTRAIL, 0x1F },
-	{ IMX462_THSTRAIL, 0x1F },
-	{ IMX462_TCLKZERO, 0x77 },
-	{ IMX462_TCLKPREPARE, 0x1F },
-	{ IMX462_TLPX, 0x17 },
+	{ IMX462_REPETITION, 0x00 }, /* 891 Mbps/lane */
+	{ IMX462_TCLKPOST, 0x77 },
+	{ IMX462_THSZERO, 0x67 },
+	{ IMX462_THSPREPARE, 0x47 },
+	{ IMX462_TCLKTRAIL, 0x37 },
+	{ IMX462_THSTRAIL, 0x3F },
+	{ IMX462_TCLKZERO, 0xFF },
+	{ IMX462_TCLKPREPARE, 0x3F },
+	{ IMX462_TLPX, 0x37 },
 	{ IMX462_TABLE_END, 0x00 },
 };
 
-/* 1920x1080@30fps 2-lane mode */
+/* 1920x1080@60fps 2-lane mode */
 static imx462_reg imx462_mode_1920x1080[] = {
 	{ IMX462_ADBIT, 0x00 },
 	{ IMX462_OUT_CTRL, 0x00 },
@@ -197,8 +197,8 @@ static imx462_reg imx462_mode_1920x1080[] = {
 	{ IMX462_Y_OUT_SIZE_MSB, (1080 >> 8) & 0xFF },
 	{ IMX462_GAIN, 0x00 },
 	{ IMX462_SHS1_LSB, 11 },
-	{ IMX462_HMAX_LSB, 4400 & 0xFF },
-	{ IMX462_HMAX_MSB, (4400 >> 8) & 0xFF },
+	{ IMX462_HMAX_LSB, 2200 & 0xFF },
+	{ IMX462_HMAX_MSB, (2200 >> 8) & 0xFF },
 	{ IMX462_TABLE_END, 0x0 },
 };
 
@@ -223,8 +223,8 @@ static imx462_reg *mode_table[] = {
 	[IMX462_MODE_TEST_PATTERN] = imx462_mode_test_pattern,
 };
 
-static const int imx462_30fps[] = {
-	30,
+static const int imx462_60fps[] = {
+	60,
 };
 
 /*
@@ -232,7 +232,7 @@ static const int imx462_30fps[] = {
  * device tree!
  */
 static const struct camera_common_frmfmt imx462_frmfmt[] = {
-	{ { 1920, 1080 }, imx462_30fps, 1, 0, IMX462_MODE_1920X1080 },
+	{ { 1920, 1080 }, imx462_60fps, 1, 0, IMX462_MODE_1920X1080 },
 };
 
 #endif /* __IMX462_MODE_TBLS_H__ */

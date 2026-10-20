@@ -220,10 +220,10 @@
 								pixel_phase = "rggb";
 								csi_pixel_bit_depth = "10";
 								readout_orientation = "0";
-								line_length = "4400";
+								line_length = "2640"; /* HMAX 2200 scaled to pix_clk_hz */
 								inherent_gain = "1";
-								mclk_multiplier = "4";
-								pix_clk_hz = "148500000";
+								mclk_multiplier = "4.8";
+								pix_clk_hz = "178200000"; /* 891 Mbps x 2 lanes / 10 bit, sizes NVCSI clock */
 								gain_factor = "10";
 								framerate_factor = "1000000";
 								exposure_factor = "1000000";
@@ -234,7 +234,7 @@
 								min_hdr_ratio = "1";
 								max_hdr_ratio = "1";
 								min_framerate = "2000000"; /* 2.0 fps */
-								max_framerate = "30000000"; /* 30.0 fps */
+								max_framerate = "60000000"; /* 60.0 fps */
 								step_framerate = "1";
 								default_framerate = "30000000"; /* 30.0 fps */
 								min_exp_time = "30"; /* us */

@@ -54,7 +54,7 @@
 /* Conversion gain */
 #define IMX462_FDG_HCG BIT(4)
 #define IMX462_FDG_LCG 0
-#define IMX462_FRSEL_30FPS 0x02
+#define IMX462_FRSEL_60FPS 0x01
 
 static const struct of_device_id imx462_of_match[] = {
 	{ .compatible = "sony,imx462" },
@@ -655,7 +655,7 @@ static int imx462_set_mode(struct tegracam_device *tc_dev)
 		return err;
 
 	err = imx462_write_reg(s_data, IMX462_FR_FDG_SEL,
-			       IMX462_FRSEL_30FPS |
+			       IMX462_FRSEL_60FPS |
 				       (hcg_mode ? IMX462_FDG_HCG :
 						   IMX462_FDG_LCG));
 	if (err)
