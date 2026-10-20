@@ -27,7 +27,7 @@
 #define IMX462_MIN_FRAME_LENGTH (1125)
 #define IMX462_MAX_FRAME_LENGTH (0x1FFFF)
 #define IMX462_MIN_COARSE_EXPOSURE (1)
-#define IMX462_MAX_COARSE_DIFF (4)
+#define IMX462_MIN_SHS1 (1)
 
 #define IMX462_VMAX_ADDR_LSB 0x3018
 #define IMX462_VMAX_ADDR_MID 0x3019
@@ -216,6 +216,12 @@ static int imx462_set_coarse_time(struct imx462 *priv, s64 val)
 
 	if (priv->frame_length == 0)
 		priv->frame_length = IMX462_MIN_FRAME_LENGTH;
+
+	/* SHS1 = VMAX - coarse_time - 1, valid SHS1 range is 1 to VMAX - 2 */
+	if (coarse_time_shs1 > priv->frame_length - IMX462_MIN_SHS1 - 1)
+		coarse_time_shs1 = priv->frame_length - IMX462_MIN_SHS1 - 1;
+	if (coarse_time_shs1 < IMX462_MIN_COARSE_EXPOSURE)
+		coarse_time_shs1 = IMX462_MIN_COARSE_EXPOSURE;
 
 	reg_shs1 = priv->frame_length - coarse_time_shs1 - 1;
 
