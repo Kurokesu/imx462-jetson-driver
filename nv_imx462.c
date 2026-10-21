@@ -86,6 +86,7 @@ struct imx462 {
 	struct i2c_client *i2c_client;
 	struct v4l2_subdev *subdev;
 	u32 frame_length;
+	s64 exposure_us;
 	struct camera_common_data *s_data;
 	struct tegracam_device *tc_dev;
 	enum imx462_Config config;
@@ -322,6 +323,10 @@ static int imx462_set_frame_rate(struct tegracam_device *tc_dev, s64 val)
 
 	priv->frame_length = vmax;
 
+	/* SHS1 counts back from VMAX, recompute it for new frame length */
+	if (priv->exposure_us)
+		err = imx462_set_coarse_time(priv, priv->exposure_us);
+
 	return err;
 }
 
@@ -333,6 +338,7 @@ static int imx462_set_exposure(struct tegracam_device *tc_dev, s64 val)
 
 	dev_dbg(dev, "%s: val: %lld\n", __func__, val);
 
+	priv->exposure_us = val;
 	err = imx462_set_coarse_time(priv, val);
 	if (err)
 		dev_dbg(dev, "%s: error coarse time SHS1 override\n", __func__);
@@ -662,6 +668,9 @@ static int imx462_set_mode(struct tegracam_device *tc_dev)
 		return err;
 
 	dev_dbg(tc_dev->dev, "hcg_mode: %d\n", hcg_mode);
+
+	priv->frame_length = IMX462_MIN_FRAME_LENGTH;
+	priv->exposure_us = 0;
 
 	return 0;
 }
