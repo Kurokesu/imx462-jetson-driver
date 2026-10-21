@@ -243,7 +243,7 @@
 							* Sensor embedded metadata height in units of rows.
 							* If sensor does not support embedded metadata value should be 0.
 							*/
-							mode0 { /* IMX462_MODE_1920X1080_2LANE */
+							mode0 { /* IMX462_MODE_1920X1080_10BIT_2LANE */
 								mclk_khz = "37125";
 								num_lanes = "2";
 								tegra_sinterface = "serial_b";
@@ -354,7 +354,7 @@
 							use_decibel_gain = "true";
 							/* enable CID_SENSOR_MODE_ID for sensor modes selection */
 							use_sensor_mode_id = "true";
-							mode0 { /* IMX462_MODE_1920X1080_2LANE */
+							mode0 { /* IMX462_MODE_1920X1080_10BIT_2LANE */
 								mclk_khz = "37125";
 								num_lanes = "2";
 								tegra_sinterface = "serial_c";
