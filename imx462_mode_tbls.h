@@ -180,7 +180,7 @@ static imx462_reg imx462_mode_common[] = {
 };
 
 /* 1920x1080@60fps 10-bit 2-lane mode */
-static imx462_reg imx462_mode_1920x1080[] = {
+static imx462_reg imx462_mode_1920x1080_10bit[] = {
 	{ IMX462_ADBIT, 0x00 },
 	{ IMX462_OUT_CTRL, 0x00 },
 	{ IMX462_ADBIT1, 0x1D },
@@ -231,7 +231,7 @@ static imx462_reg imx462_mode_test_pattern[] = {
 };
 
 enum {
-	IMX462_MODE_1920X1080,
+	IMX462_MODE_1920X1080_10BIT,
 	IMX462_MODE_1920X1080_12BIT,
 	IMX462_MODE_COMMON,
 	IMX462_START_STREAM,
@@ -240,7 +240,7 @@ enum {
 };
 
 static imx462_reg *mode_table[] = {
-	[IMX462_MODE_1920X1080] = imx462_mode_1920x1080,
+	[IMX462_MODE_1920X1080_10BIT] = imx462_mode_1920x1080_10bit,
 	[IMX462_MODE_1920X1080_12BIT] = imx462_mode_1920x1080_12bit,
 	[IMX462_MODE_COMMON] = imx462_mode_common,
 	[IMX462_START_STREAM] = imx462_start,
@@ -257,7 +257,7 @@ static const int imx462_60fps[] = {
  * device tree!
  */
 static const struct camera_common_frmfmt imx462_frmfmt[] = {
-	{ { 1920, 1080 }, imx462_60fps, 1, 0, IMX462_MODE_1920X1080 },
+	{ { 1920, 1080 }, imx462_60fps, 1, 0, IMX462_MODE_1920X1080_10BIT },
 	{ { 1920, 1080 }, imx462_60fps, 1, 0, IMX462_MODE_1920X1080_12BIT },
 };
 
