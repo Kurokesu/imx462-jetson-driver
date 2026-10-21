@@ -6,7 +6,7 @@
 ![JetPack 6.2.2](https://img.shields.io/badge/JetPack_6.2.2-L4T_36.5.0-brightgreen?logo=nvidia&logoColor=white)
 ![JetPack 6.2.3](https://img.shields.io/badge/JetPack_6.2.3-L4T_36.5.2-brightgreen?logo=nvidia&logoColor=white)
 
-NVIDIA Jetson kernel driver for Sony IMX462, a 2 MP 1/2.8" STARVIS back-side illuminated CMOS sensor optimised for low-light and night-vision applications.
+NVIDIA Jetson Orin kernel driver for Sony IMX462, a 2 MP 1/2.8" STARVIS back-side illuminated CMOS sensor optimised for low-light and night-vision applications.
 
 Current driver capabilities:
 
@@ -19,7 +19,7 @@ Current driver capabilities:
 > [!NOTE]
 > 4-lane support for cam1 is planned.
 
-![Kurokesu camera modules connected to a Jetson carrier board over CSI ribbon cables.](./docs/kurokesu-on-jetson.jpg)
+![Kurokesu camera modules connected to Jetson Orin NX developer kit over CSI ribbon cables.](./docs/kurokesu-on-jetson.jpg)
 
 *IMX462 camera modules are available at [kurokesu.com](https://www.kurokesu.com/item/462C-CSI)*
 
@@ -94,6 +94,13 @@ tegra-camrtc-capture-vi tegra-capture-vi: subdev imx462 10-001a bound
 
 ## Image output
 
+Sensor modes, selected with Argus `sensor-mode` or V4L2 `sensor_mode`:
+
+| Mode | Resolution | Bit depth | V4L2 format | Max fps |
+| ---- | ---------- | --------- | ----------- | ------- |
+| 0    | 1920×1080  | 10-bit    | `RG10`      | 60      |
+| 1    | 1920×1080  | 12-bit    | `RG12`      | 60      |
+
 ### GStreamer
 
 Single:
@@ -161,7 +168,7 @@ View raw file:
 ```bash
 python3 view_raw.py ./imx462_1080p.raw
 python3 view_raw.py --mono ./imx462_1080p.raw  # mono sensor
-python3 view_raw.py --bits 12 ./imx462_1080p_12bit.raw
+python3 view_raw.py --bit-depth 12 ./imx462_1080p_12bit.raw
 ```
 
 ## HCG mode
