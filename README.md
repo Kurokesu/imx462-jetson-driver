@@ -145,14 +145,16 @@ sudo apt install -y python3-opencv
 Stream raw data to file:
 
 ```bash
-v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0,sensor_mode=0 --set-fmt-video=width=1920,height=1080,pixelformat=RG10 --stream-mmap --stream-to imx462_1080p.raw --stream-count=1 --stream-skip=10 --verbose
+v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0,sensor_mode=0,override_enable=1,frame_rate=30000000,exposure=10000,gain=150 --set-fmt-video=width=1920,height=1080,pixelformat=RG10 --stream-mmap --stream-to imx462_1080p.raw --stream-count=1 --stream-skip=10 --verbose
 ```
 
 12-bit mode:
 
 ```bash
-v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0,sensor_mode=1 --set-fmt-video=width=1920,height=1080,pixelformat=RG12 --stream-mmap --stream-to imx462_1080p_12bit.raw --stream-count=1 --stream-skip=10 --verbose
+v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0,sensor_mode=1,override_enable=1,frame_rate=30000000,exposure=10000,gain=150 --set-fmt-video=width=1920,height=1080,pixelformat=RG12 --stream-mmap --stream-to imx462_1080p_12bit.raw --stream-count=1 --stream-skip=10 --verbose
 ```
+
+*`override_enable=1` applies frame rate, exposure and gain. Without it sensor runs mode defaults. Frame rate is in fps × 1000000, exposure in µs and gain in 0.1 dB.*
 
 View raw file:
 
