@@ -243,6 +243,7 @@ static imx462_reg imx462_mode_1920x1080_12bit[] = {
 static imx462_reg imx462_mode_test_pattern[] = {
 	{ IMX462_BLKLEVEL, 0x00 },
 	{ IMX462_TABLE_WAIT_MS, IMX462_WAIT_MS * 10 },
+	{ IMX462_TABLE_END, 0x00 },
 };
 
 enum {
