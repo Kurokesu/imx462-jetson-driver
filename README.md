@@ -93,10 +93,14 @@ tegra-camrtc-capture-vi tegra-capture-vi: subdev imx462 10-001a bound
 
 Sensor modes, selected with Argus `sensor-mode` or V4L2 `sensor_mode`:
 
-| Mode | Resolution | Bit depth | V4L2 format | Max fps |
-| ---- | ---------- | --------- | ----------- | ------- |
-| 0    | 1920×1080  | 10-bit    | `RG10`      | 60      |
-| 1    | 1920×1080  | 12-bit    | `RG12`      | 60      |
+| Mode | Resolution | Port | Lanes | Bit depth | V4L2 format | Data rate / lane | Max fps |
+| ---- | ---------- | ---- | ----- | --------- | ----------- | ---------------- | ------- |
+| 0    | 1920×1080  | cam0 | 2     | 10        | `RG10`      | 891 Mbps         | 60 fps  |
+| 1    | 1920×1080  | cam0 | 2     | 12        | `RG12`      | 891 Mbps         | 60 fps  |
+| 0    | 1920×1080  | cam1 | 4     | 10        | `RG10`      | 891 Mbps         | 120 fps |
+| 1    | 1920×1080  | cam1 | 4     | 12        | `RG12`      | 445.5 Mbps       | 60 fps  |
+
+*Without `sensor-mode`, `nvarguscamerasrc` picks last mode that fits requested resolution and frame rate.*
 
 ### GStreamer
 
