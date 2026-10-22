@@ -6,15 +6,15 @@
 ![JetPack 6.2.2](https://img.shields.io/badge/JetPack_6.2.2-L4T_36.5.0-brightgreen?logo=nvidia&logoColor=white)
 ![JetPack 6.2.3](https://img.shields.io/badge/JetPack_6.2.3-L4T_36.5.2-brightgreen?logo=nvidia&logoColor=white)
 
-NVIDIA Jetson Orin kernel driver for Sony IMX462, a 2 MP 1/2.8" STARVIS back-side illuminated CMOS sensor optimised for low-light and night-vision applications.
+NVIDIA Jetson Orin kernel driver for Sony IMX462, a 2 MP 1/2.8" STARVIS back-side illuminated CMOS sensor optimized for low-light and night-vision applications.
 
 Driver capabilities:
 
-- 2-lane and 4-lane MIPI CSI-2
-- 10-bit and 12-bit RAW output
 - 1920×1080 up to 120 fps
+- 10-bit and 12-bit RAW output
+- 2-lane and 4-lane MIPI CSI-2, single or dual camera
 - HCG (High Conversion Gain) mode for improved low-light SNR
-- Color and mono
+- Color and mono with calibrated Argus ISP tuning
 
 ![Kurokesu camera modules connected to Jetson Orin NX developer kit over CSI ribbon cables.](./docs/kurokesu-on-jetson.jpg)
 
@@ -47,8 +47,8 @@ Setup script:
 - Fetches NVIDIA device tree headers required for build
 - Builds and installs kernel module via [DKMS](https://github.com/dell/dkms)
 - Builds and copies device tree overlay (`.dtbo`) to `/boot`
-- Installs ISP tuning to `/var/nvidia/nvcam/settings/`
-- Installs udev rule keeping camera RTCPU awake
+- Installs [ISP tuning](#isp-tuning) to `/var/nvidia/nvcam/settings/`
+- Installs udev rule [keeping camera RTCPU awake](#rtcpu-keep-awake)
 
 > [!NOTE]
 > Setup links color ISP tuning to both ports. For mono sensor, switch to [mono tuning](#mono-sensor).
@@ -172,7 +172,7 @@ sudo apt install -y python3-opencv
 > [!IMPORTANT]
 > With dual overlay, NVIDIA maps cam1 to `/dev/video0` and cam0 to `/dev/video1`.
 
-Stream raw 10-bit data to file, for 12-bit set `sensor_mode=1` and `pixelformat=RG12`:
+Stream raw 10-bit data to file (for 12-bit use `sensor_mode=1` with `pixelformat=RG12`):
 
 ```bash
 v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0,sensor_mode=0,override_enable=1,frame_rate=30000000,exposure=10000,gain=150 --set-fmt-video=width=1920,height=1080,pixelformat=RG10 --stream-mmap --stream-to imx462_1080p.raw --stream-count=1 --stream-skip=10 --verbose
