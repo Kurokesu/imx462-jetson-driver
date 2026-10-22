@@ -50,6 +50,7 @@
 #define IMX462_PGCTRL_REGEN BIT(0)
 #define IMX462_PGCTRL_THRU BIT(1)
 #define IMX462_PGCTRL_MODE(n) ((n) << 4)
+#define IMX462_PGCTRL_MODE_MAX 7
 
 /* Conversion gain */
 #define IMX462_FDG_HCG BIT(4)
@@ -62,8 +63,9 @@ static const struct of_device_id imx462_of_match[] = {
 
 MODULE_DEVICE_TABLE(of, imx462_of_match);
 
-static int test_mode;
-module_param(test_mode, int, 0644);
+static unsigned int test_mode;
+module_param(test_mode, uint, 0644);
+MODULE_PARM_DESC(test_mode, "Test pattern 0 to 7, 0 is off");
 
 static bool hcg_mode;
 module_param(hcg_mode, bool, 0644);
@@ -700,8 +702,11 @@ static int imx462_start_streaming(struct tegracam_device *tc_dev)
 
 	dev_dbg(tc_dev->dev, "%s:\n", __func__);
 
-	if (test_mode) {
-		dev_dbg(tc_dev->dev, "Test mode %d\n", test_mode);
+	if (test_mode > IMX462_PGCTRL_MODE_MAX) {
+		dev_warn(tc_dev->dev, "test_mode %u out of range, ignored\n",
+			 test_mode);
+	} else if (test_mode) {
+		dev_dbg(tc_dev->dev, "Test mode %u\n", test_mode);
 
 		err = imx462_write_table(priv,
 					 mode_table[IMX462_MODE_TEST_PATTERN]);
