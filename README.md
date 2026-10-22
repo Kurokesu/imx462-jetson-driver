@@ -50,6 +50,9 @@ Setup script:
 - Installs ISP tuning to `/var/nvidia/nvcam/settings/`
 - Installs udev rule keeping camera RTCPU awake
 
+> [!NOTE]
+> Setup links color ISP tuning to both ports. For mono sensor, switch to [mono tuning](#mono-sensor).
+
 Use Jetson-IO to configure CSI connector:
 
 ```bash
