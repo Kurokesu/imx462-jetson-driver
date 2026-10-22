@@ -112,7 +112,7 @@ gst-launch-1.0 -e nvarguscamerasrc sensor-id=0 ! \
    queue ! nvvidconv ! queue ! nveglglessink
 ```
 
-Dual:
+Dual (cam0 maps to `sensor-id=0`, cam1 to `sensor-id=1`):
 
 ```bash
 gst-launch-1.0 -e \
@@ -123,6 +123,31 @@ gst-launch-1.0 -e \
       'video/x-raw(memory:NVMM),width=1920,height=1080,framerate=30/1' ! \
       queue ! nvvidconv ! queue ! nveglglessink
 ```
+
+Stream cam1 at 120 fps (C overlay):
+
+```bash
+gst-launch-1.0 -e nvarguscamerasrc sensor-id=0 ! \
+   'video/x-raw(memory:NVMM),width=1920,height=1080,framerate=120/1' ! \
+   queue ! nvvidconv ! queue ! nveglglessink
+```
+
+> [!IMPORTANT]
+> `nvarguscamerasrc` copies frames through VIC, which caps Argus at about 60 fps on default clock. With VIC `performance` governor enabled, Orin NX 16 GB reaches 120 fps in 25 W power mode or higher. 15 W tops out at about 105 fps.
+
+<details>
+<summary>VIC governor</summary>
+
+Enable VIC `performance` governor and keep it across reboots:
+
+```bash
+echo performance | sudo tee /sys/class/devfreq/15340000.vic/governor
+sudo mkdir -p /etc/systemd/system/nvpower.service.d
+printf '[Service]\nExecStartPost=/bin/sh -c "echo performance > /sys/class/devfreq/15340000.vic/governor"\n' | \
+   sudo tee /etc/systemd/system/nvpower.service.d/vic-performance.conf
+```
+
+</details>
 
 ### nvgstcapture
 
@@ -152,13 +177,19 @@ v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0,sensor_mode=0,override_enable=1
 
 *`override_enable=1` applies frame rate, exposure and gain. Without it sensor runs mode defaults. Frame rate is in fps × 1000000, exposure in µs and gain in 0.1 dB.*
 
+Stream cam1 at 120 fps. Frame rate limit follows active mode, so select 10-bit format first:
+
+```bash
+v4l2-ctl -d /dev/video0 --set-ctrl sensor_mode=0 --set-fmt-video=width=1920,height=1080,pixelformat=RG10
+v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0,sensor_mode=0,override_enable=1,frame_rate=120000000,exposure=5000,gain=150 --set-fmt-video=width=1920,height=1080,pixelformat=RG10 --stream-mmap --stream-to imx462_1080p_120fps.raw --stream-count=1 --stream-skip=10 --verbose
+```
+
 View raw file:
 
 ```bash
 python3 view_raw.py ./imx462_1080p.raw
 python3 view_raw.py --mono ./imx462_1080p.raw  # mono sensor
 python3 view_raw.py --bit-depth 12 ./imx462_1080p.raw  # 12-bit mode
-```
 ```
 
 ## HCG mode
