@@ -124,14 +124,6 @@ gst-launch-1.0 -e \
       queue ! nvvidconv ! queue ! nveglglessink
 ```
 
-Argus picks 12-bit mode by default. Select 10-bit mode with `sensor-mode=0`:
-
-```bash
-gst-launch-1.0 -e nvarguscamerasrc sensor-id=0 sensor-mode=0 ! \
-   'video/x-raw(memory:NVMM),width=1920,height=1080,framerate=30/1' ! \
-   queue ! nvvidconv ! queue ! nveglglessink
-```
-
 ### nvgstcapture
 
 NVIDIA interactive Argus capture tool:
@@ -152,16 +144,10 @@ sudo apt install -y python3-opencv
 > [!IMPORTANT]
 > With dual overlay, NVIDIA maps cam1 to `/dev/video0` and cam0 to `/dev/video1`.
 
-Stream raw data to file:
+Stream raw 10-bit data to file, for 12-bit set `sensor_mode=1` and `pixelformat=RG12`:
 
 ```bash
 v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0,sensor_mode=0,override_enable=1,frame_rate=30000000,exposure=10000,gain=150 --set-fmt-video=width=1920,height=1080,pixelformat=RG10 --stream-mmap --stream-to imx462_1080p.raw --stream-count=1 --stream-skip=10 --verbose
-```
-
-12-bit mode:
-
-```bash
-v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0,sensor_mode=1,override_enable=1,frame_rate=30000000,exposure=10000,gain=150 --set-fmt-video=width=1920,height=1080,pixelformat=RG12 --stream-mmap --stream-to imx462_1080p_12bit.raw --stream-count=1 --stream-skip=10 --verbose
 ```
 
 *`override_enable=1` applies frame rate, exposure and gain. Without it sensor runs mode defaults. Frame rate is in fps × 1000000, exposure in µs and gain in 0.1 dB.*
@@ -171,7 +157,8 @@ View raw file:
 ```bash
 python3 view_raw.py ./imx462_1080p.raw
 python3 view_raw.py --mono ./imx462_1080p.raw  # mono sensor
-python3 view_raw.py --bit-depth 12 ./imx462_1080p_12bit.raw
+python3 view_raw.py --bit-depth 12 ./imx462_1080p.raw  # 12-bit mode
+```
 ```
 
 ## HCG mode
