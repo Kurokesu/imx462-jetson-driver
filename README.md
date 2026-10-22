@@ -65,9 +65,9 @@ Navigate through the menu:
 2. Configure for compatible hardware
 3. Select port configuration:
 
-    - `Camera IMX462-A` - cam0
-    - `Camera IMX462-C` - cam1
-    - `Camera IMX462 Dual` - cam0 + cam1
+    - `Camera IMX462-A` - cam0 (2-lane)
+    - `Camera IMX462-C` - cam1 (4-lane)
+    - `Camera IMX462 Dual` - cam0 (2-lane) + cam1 (4-lane)
 
     ![Jetson-IO menu with Camera IMX462 Dual selected.](./docs/jetson-io-tool.png)
 
