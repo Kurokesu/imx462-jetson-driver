@@ -134,6 +134,8 @@ gst-launch-1.0 -e nvarguscamerasrc sensor-id=0 sensor-mode=0 ! \
 
 ### nvgstcapture
 
+NVIDIA interactive Argus capture tool:
+
 ```bash
 nvgstcapture-1.0 --sensor-id 0
 ```
