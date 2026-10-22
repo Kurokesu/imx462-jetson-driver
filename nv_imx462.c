@@ -54,7 +54,6 @@
 /* Conversion gain */
 #define IMX462_FDG_HCG BIT(4)
 #define IMX462_FDG_LCG 0
-#define IMX462_FRSEL_60FPS 0x01
 
 static const struct of_device_id imx462_of_match[] = {
 	{ .compatible = "sony,imx462" },
@@ -77,9 +76,10 @@ static const u32 ctrl_cid_list[] = {
 	TEGRA_CAMERA_CID_SENSOR_MODE_ID,
 };
 
-enum imx462_Config {
-	TWO_LANE_CONFIG,
-	FOUR_LANE_CONFIG,
+struct imx462_config {
+	const imx462_reg *timing;
+	u16 hmax;
+	u8 frsel;
 };
 
 struct imx462 {
@@ -89,7 +89,7 @@ struct imx462 {
 	s64 exposure_us;
 	struct camera_common_data *s_data;
 	struct tegracam_device *tc_dev;
-	enum imx462_Config config;
+	const struct imx462_config *config;
 };
 
 static const struct regmap_config sensor_regmap_config = {
@@ -98,6 +98,13 @@ static const struct regmap_config sensor_regmap_config = {
 	.cache_type = REGCACHE_RBTREE,
 	.use_single_read = true,
 	.use_single_write = true,
+};
+
+static const struct imx462_config imx462_config_2lane[] = {
+	[IMX462_MODE_1920X1080_10BIT] = { imx462_link_891mbps, 2200,
+					  IMX462_FRSEL_60FPS },
+	[IMX462_MODE_1920X1080_12BIT] = { imx462_link_891mbps, 2200,
+					  IMX462_FRSEL_60FPS },
 };
 
 static inline void imx462_get_vmax_regs(imx462_reg *regs, u32 vmax)
@@ -621,49 +628,52 @@ error:
 	return ret;
 }
 
+static int imx462_write_config(struct imx462 *priv,
+			       const struct imx462_config *config)
+{
+	int err;
+	u8 lanes = priv->s_data->numlanes - 1; /* 0x1: 2 lanes, 0x3: 4 lanes */
+	u8 fdg = hcg_mode ? IMX462_FDG_HCG : IMX462_FDG_LCG;
+	const imx462_reg regs[] = {
+		{ IMX462_PHY_LANE_NUM, lanes },
+		{ IMX462_CSI_LANE_MODE, lanes },
+		{ IMX462_HMAX_LSB, config->hmax & 0xFF },
+		{ IMX462_HMAX_MSB, (config->hmax >> 8) & 0xFF },
+		{ IMX462_FR_FDG_SEL, config->frsel | fdg },
+		{ IMX462_TABLE_END, 0x00 },
+	};
+
+	err = imx462_write_table(priv, config->timing);
+	if (err)
+		return err;
+
+	return imx462_write_table(priv, regs);
+}
+
 static int imx462_set_mode(struct tegracam_device *tc_dev)
 {
 	struct imx462 *priv = (struct imx462 *)tegracam_get_privdata(tc_dev);
 	struct camera_common_data *s_data = tc_dev->s_data;
-	unsigned int mode_index = 0;
+	const struct imx462_config *config;
 	int err = 0;
-	const char *config;
-	struct device_node *mode;
-	uint offset = ARRAY_SIZE(imx462_frmfmt);
 
-	dev_dbg(tc_dev->dev, "%s:\n", __func__);
-	mode = of_get_child_by_name(tc_dev->dev->of_node, "mode0");
-	err = of_property_read_string(mode, "num_lanes", &config);
-
-	if (config[0] == '4') {
-		priv->config = FOUR_LANE_CONFIG;
-		dev_dbg(tc_dev->dev, "Using 4-lane configuration\n");
-	} else if (config[0] == '2') {
-		priv->config = TWO_LANE_CONFIG;
-		dev_dbg(tc_dev->dev, "Using 2-lane configuration\n");
-	} else {
-		dev_err(tc_dev->dev, "Unsupported config\n");
+	if (s_data->mode < 0 || s_data->mode >= ARRAY_SIZE(imx462_frmfmt))
 		return -EINVAL;
-	}
+
+	config = &priv->config[s_data->mode];
+
+	dev_dbg(tc_dev->dev, "%s: mode %d, %d lanes, hmax %u\n", __func__,
+		s_data->mode, s_data->numlanes, config->hmax);
 
 	err = imx462_write_table(priv, mode_table[IMX462_MODE_COMMON]);
 	if (err)
 		return err;
 
-	mode_index = s_data->mode;
-	if (priv->config == FOUR_LANE_CONFIG)
-		err = imx462_write_table(priv, mode_table[mode_index + offset]);
-	else {
-		dev_dbg(tc_dev->dev, "Writing mode table %d\n", mode_index);
-		err = imx462_write_table(priv, mode_table[mode_index]);
-	}
+	err = imx462_write_table(priv, mode_table[s_data->mode]);
 	if (err)
 		return err;
 
-	err = imx462_write_reg(s_data, IMX462_FR_FDG_SEL,
-			       IMX462_FRSEL_60FPS |
-				       (hcg_mode ? IMX462_FDG_HCG :
-						   IMX462_FDG_LCG));
+	err = imx462_write_config(priv, config);
 	if (err)
 		return err;
 
@@ -826,6 +836,17 @@ static int imx462_probe(struct i2c_client *client,
 	priv->s_data = tc_dev->s_data;
 	priv->subdev = &tc_dev->s_data->subdev;
 	tegracam_set_privdata(tc_dev, (void *)priv);
+
+	switch (priv->s_data->numlanes) {
+	case 2:
+		priv->config = imx462_config_2lane;
+		break;
+	default:
+		dev_err(dev, "unsupported lane count %d\n",
+			priv->s_data->numlanes);
+		tegracam_device_unregister(tc_dev);
+		return -EINVAL;
+	}
 
 	err = imx462_board_setup(priv);
 	if (err) {
