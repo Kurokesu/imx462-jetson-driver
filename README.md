@@ -146,8 +146,10 @@ Enable VIC `performance` governor and keep it across reboots:
 ```bash
 echo performance | sudo tee /sys/class/devfreq/15340000.vic/governor
 sudo mkdir -p /etc/systemd/system/nvpower.service.d
-printf '[Service]\nExecStartPost=/bin/sh -c "echo performance > /sys/class/devfreq/15340000.vic/governor"\n' | \
-   sudo tee /etc/systemd/system/nvpower.service.d/vic-performance.conf
+sudo tee /etc/systemd/system/nvpower.service.d/vic-performance.conf <<'EOF'
+[Service]
+ExecStartPost=/bin/sh -c "echo performance > /sys/class/devfreq/15340000.vic/governor"
+EOF
 ```
 
 </details>
@@ -175,7 +177,12 @@ sudo apt install -y python3-opencv
 Stream raw 10-bit data to file (for 12-bit use `sensor_mode=1` with `pixelformat=RG12`):
 
 ```bash
-v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0,sensor_mode=0,override_enable=1,frame_rate=30000000,exposure=10000,gain=150 --set-fmt-video=width=1920,height=1080,pixelformat=RG10 --stream-mmap --stream-to imx462_1080p.raw --stream-count=1 --stream-skip=10 --verbose
+v4l2-ctl -d /dev/video0 \
+   --set-ctrl bypass_mode=0,sensor_mode=0,override_enable=1 \
+   --set-ctrl frame_rate=30000000,exposure=10000,gain=150 \
+   --set-fmt-video=width=1920,height=1080,pixelformat=RG10 \
+   --stream-mmap --stream-skip=10 --stream-count=1 \
+   --stream-to imx462_1080p.raw --verbose
 ```
 
 *`override_enable=1` applies frame rate, exposure and gain. Without it sensor runs mode defaults. Frame rate is in fps × 1000000, exposure in µs and gain in 0.1 dB.*
@@ -183,8 +190,14 @@ v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0,sensor_mode=0,override_enable=1
 Stream cam1 at 120 fps. Frame rate limit follows active mode, so select 10-bit format first:
 
 ```bash
-v4l2-ctl -d /dev/video0 --set-ctrl sensor_mode=0 --set-fmt-video=width=1920,height=1080,pixelformat=RG10
-v4l2-ctl -d /dev/video0 --set-ctrl bypass_mode=0,sensor_mode=0,override_enable=1,frame_rate=120000000,exposure=5000,gain=150 --set-fmt-video=width=1920,height=1080,pixelformat=RG10 --stream-mmap --stream-to imx462_1080p_120fps.raw --stream-count=1 --stream-skip=10 --verbose
+v4l2-ctl -d /dev/video0 --set-ctrl sensor_mode=0 \
+   --set-fmt-video=width=1920,height=1080,pixelformat=RG10
+v4l2-ctl -d /dev/video0 \
+   --set-ctrl bypass_mode=0,sensor_mode=0,override_enable=1 \
+   --set-ctrl frame_rate=120000000,exposure=5000,gain=150 \
+   --set-fmt-video=width=1920,height=1080,pixelformat=RG10 \
+   --stream-mmap --stream-skip=10 --stream-count=1 \
+   --stream-to imx462_1080p_120fps.raw --verbose
 ```
 
 View raw file:
@@ -270,7 +283,7 @@ Switch back to color by linking `kurokesu_462CSI.isp` instead.
 On JetPack 6 camera RTCPU suspends after 5 s idle and redoes NVCSI calibration on resume. When that fails, next Argus (`nvarguscamerasrc`) launch gets no frames until reboot:
 
 ```
-SCF: Error InvalidState: Timeout!! Skipping requests on sensor GUID 0 ... (FusaCaptureViCsiHw.cpp, function waitCsiFrameStart())
+SCF: Error InvalidState: Timeout!! Skipping requests on sensor GUID 0 ...
 ```
 
 `setup.sh` installs `udev/99-camera-rtcpu.rules` to keep RTCPU awake, as NVIDIA [suggests](https://forums.developer.nvidia.com/t/issue-about-nvcsi/299349). Manual alternative, lasts until reboot:
