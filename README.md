@@ -8,16 +8,13 @@
 
 NVIDIA Jetson Orin kernel driver for Sony IMX462, a 2 MP 1/2.8" STARVIS back-side illuminated CMOS sensor optimised for low-light and night-vision applications.
 
-Current driver capabilities:
+Driver capabilities:
 
-- 2-lane MIPI CSI-2
+- 2-lane and 4-lane MIPI CSI-2
 - 10-bit and 12-bit RAW output
-- 1920×1080 @ 60 fps
+- 1920×1080 up to 120 fps
 - HCG (High Conversion Gain) mode for improved low-light SNR
 - Color and mono
-
-> [!NOTE]
-> 4-lane support for cam1 is planned.
 
 ![Kurokesu camera modules connected to Jetson Orin NX developer kit over CSI ribbon cables.](./docs/kurokesu-on-jetson.jpg)
 
