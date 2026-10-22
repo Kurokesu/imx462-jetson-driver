@@ -45,6 +45,7 @@
 #define IMX462_PHY_LANE_NUM 0x3407
 #define IMX462_CSI_LANE_MODE 0x3443
 #define IMX462_FR_FDG_SEL 0x3009
+#define IMX462_FRSEL_60FPS 0x01
 
 #define IMX462_REPETITION 0x3405
 #define IMX462_TCLKPOST 0x3446
@@ -165,9 +166,12 @@ static imx462_reg imx462_mode_common[] = {
 	{ IMX462_INCKSEL4, 0x01 },
 	{ IMX462_INCKSEL5, 0x1A },
 	{ IMX462_INCKSEL6, 0x1A },
-	{ IMX462_PHY_LANE_NUM, 0x01 }, /* 2 lanes */
-	{ IMX462_CSI_LANE_MODE, 0x01 }, /* 2 lanes */
-	{ IMX462_REPETITION, 0x00 }, /* 891 Mbps/lane */
+	{ IMX462_TABLE_END, 0x00 },
+};
+
+static const imx462_reg imx462_link_891mbps[] = {
+	{ IMX462_REPETITION, 0x00 },
+	/* MIPI global timing */
 	{ IMX462_TCLKPOST, 0x77 },
 	{ IMX462_THSZERO, 0x67 },
 	{ IMX462_THSPREPARE, 0x47 },
@@ -179,7 +183,7 @@ static imx462_reg imx462_mode_common[] = {
 	{ IMX462_TABLE_END, 0x00 },
 };
 
-/* 1920x1080@60fps 10-bit 2-lane mode */
+/* 1920x1080 10-bit mode */
 static imx462_reg imx462_mode_1920x1080_10bit[] = {
 	{ IMX462_ADBIT, 0x00 },
 	{ IMX462_OUT_CTRL, 0x00 },
@@ -197,12 +201,10 @@ static imx462_reg imx462_mode_1920x1080_10bit[] = {
 	{ IMX462_Y_OUT_SIZE_MSB, (1080 >> 8) & 0xFF },
 	{ IMX462_GAIN, 0x00 },
 	{ IMX462_SHS1_LSB, 11 },
-	{ IMX462_HMAX_LSB, 2200 & 0xFF },
-	{ IMX462_HMAX_MSB, (2200 >> 8) & 0xFF },
 	{ IMX462_TABLE_END, 0x0 },
 };
 
-/* 1920x1080@60fps 12-bit 2-lane mode */
+/* 1920x1080 12-bit mode */
 static imx462_reg imx462_mode_1920x1080_12bit[] = {
 	{ IMX462_ADBIT, 0x01 },
 	{ IMX462_OUT_CTRL, 0x01 },
@@ -220,8 +222,6 @@ static imx462_reg imx462_mode_1920x1080_12bit[] = {
 	{ IMX462_Y_OUT_SIZE_MSB, (1080 >> 8) & 0xFF },
 	{ IMX462_GAIN, 0x00 },
 	{ IMX462_SHS1_LSB, 11 },
-	{ IMX462_HMAX_LSB, 2200 & 0xFF },
-	{ IMX462_HMAX_MSB, (2200 >> 8) & 0xFF },
 	{ IMX462_TABLE_END, 0x0 },
 };
 
