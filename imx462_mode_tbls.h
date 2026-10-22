@@ -45,6 +45,7 @@
 #define IMX462_PHY_LANE_NUM 0x3407
 #define IMX462_CSI_LANE_MODE 0x3443
 #define IMX462_FR_FDG_SEL 0x3009
+#define IMX462_FRSEL_120FPS 0x00
 #define IMX462_FRSEL_60FPS 0x01
 
 #define IMX462_REPETITION 0x3405
@@ -183,6 +184,20 @@ static const imx462_reg imx462_link_891mbps[] = {
 	{ IMX462_TABLE_END, 0x00 },
 };
 
+static const imx462_reg imx462_link_445mbps[] = {
+	{ IMX462_REPETITION, 0x10 },
+	/* MIPI global timing */
+	{ IMX462_TCLKPOST, 0x57 },
+	{ IMX462_THSZERO, 0x37 },
+	{ IMX462_THSPREPARE, 0x1F },
+	{ IMX462_TCLKTRAIL, 0x1F },
+	{ IMX462_THSTRAIL, 0x1F },
+	{ IMX462_TCLKZERO, 0x77 },
+	{ IMX462_TCLKPREPARE, 0x1F },
+	{ IMX462_TLPX, 0x17 },
+	{ IMX462_TABLE_END, 0x00 },
+};
+
 /* 1920x1080 10-bit mode */
 static imx462_reg imx462_mode_1920x1080_10bit[] = {
 	{ IMX462_ADBIT, 0x00 },
@@ -252,12 +267,21 @@ static const int imx462_60fps[] = {
 	60,
 };
 
+static const int imx462_120fps[] = {
+	120,
+};
+
 /*
  * WARNING: frmfmt ordering need to match mode definition in
  * device tree!
  */
 static const struct camera_common_frmfmt imx462_frmfmt[] = {
 	{ { 1920, 1080 }, imx462_60fps, 1, 0, IMX462_MODE_1920X1080_10BIT },
+	{ { 1920, 1080 }, imx462_60fps, 1, 0, IMX462_MODE_1920X1080_12BIT },
+};
+
+static const struct camera_common_frmfmt imx462_frmfmt_4lane[] = {
+	{ { 1920, 1080 }, imx462_120fps, 1, 0, IMX462_MODE_1920X1080_10BIT },
 	{ { 1920, 1080 }, imx462_60fps, 1, 0, IMX462_MODE_1920X1080_12BIT },
 };
 

@@ -259,7 +259,7 @@
 								readout_orientation = "0";
 								line_length = "2200";
 								inherent_gain = "1";
-								pix_clk_hz = "148500000";
+								pix_clk_hz = "148500000"; /* 891 Mbps x 2 lanes / 12 bit */
 								gain_factor = "10";
 								framerate_factor = "1000000";
 								exposure_factor = "1000000";

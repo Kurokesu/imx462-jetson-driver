@@ -107,6 +107,13 @@ static const struct imx462_config imx462_config_2lane[] = {
 					  IMX462_FRSEL_60FPS },
 };
 
+static const struct imx462_config imx462_config_4lane[] = {
+	[IMX462_MODE_1920X1080_10BIT] = { imx462_link_891mbps, 1100,
+					  IMX462_FRSEL_120FPS },
+	[IMX462_MODE_1920X1080_12BIT] = { imx462_link_445mbps, 2200,
+					  IMX462_FRSEL_60FPS },
+};
+
 static inline void imx462_get_vmax_regs(imx462_reg *regs, u32 vmax)
 {
 	regs->addr = IMX462_VMAX_ADDR_MSB;
@@ -840,6 +847,11 @@ static int imx462_probe(struct i2c_client *client,
 	switch (priv->s_data->numlanes) {
 	case 2:
 		priv->config = imx462_config_2lane;
+		break;
+	case 4:
+		priv->config = imx462_config_4lane;
+		priv->s_data->frmfmt = imx462_frmfmt_4lane;
+		priv->s_data->numfmts = ARRAY_SIZE(imx462_frmfmt_4lane);
 		break;
 	default:
 		dev_err(dev, "unsupported lane count %d\n",
