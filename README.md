@@ -5,6 +5,8 @@
 ![JetPack 6.2.1](https://img.shields.io/badge/JetPack_6.2.1-L4T_36.4.4-brightgreen?logo=nvidia&logoColor=white)
 ![JetPack 6.2.2](https://img.shields.io/badge/JetPack_6.2.2-L4T_36.5.0-brightgreen?logo=nvidia&logoColor=white)
 ![JetPack 6.2.3](https://img.shields.io/badge/JetPack_6.2.3-L4T_36.5.2-brightgreen?logo=nvidia&logoColor=white)
+![JetPack 7.2](https://img.shields.io/badge/JetPack_7.2-L4T_39.2.0-yellow?logo=nvidia&logoColor=white)
+![JetPack 7.2.1](https://img.shields.io/badge/JetPack_7.2.1-L4T_39.2.1-yellow?logo=nvidia&logoColor=white)
 
 NVIDIA Jetson Orin kernel driver for Sony IMX462, a 2 MP 1/2.8" STARVIS back-side illuminated CMOS sensor optimized for low-light and night-vision applications.
 
@@ -104,6 +106,9 @@ Sensor modes, selected with Argus `sensor-mode` or V4L2 `sensor_mode`:
 | 1    | 1920×1080  | cam1 | 4     | 12        | `RG12`      | 445.5 Mbps       | 60 fps  |
 
 *Without `sensor-mode`, `nvarguscamerasrc` picks last mode that fits requested resolution and frame rate.*
+
+> [!IMPORTANT]
+> On JetPack 7.2 Argus requires NITO tuning files, which are not yet available for IMX462. Until then, use [raw V4L2](#raw-v4l2) capture.
 
 ### GStreamer
 
